@@ -1,3 +1,9 @@
 <Solution>
   <Project Path="AcademiaDoZe.Domain/AcademiaDoZe.Domain.csproj" />
+  <Project Path="AcademiaDoZe.Infrastructure/AcademiaDoZe.Infrastructure.csproj" />
+  <Project Path="AcademiaDoZe.Application/AcademiaDoZe.Application.csproj" />
+  <Folder Name="/Testes/">
+    <Project Path="Testes/AcademiaDoZe.Domain.Tests/AcademiaDoZe.Domain.Tests.csproj" />
+    <Project Path="Testes/AcademiaDoZe.Infrastructure.Tests/AcademiaDoZe.Infrastructure.Tests.csproj" />
+  </Folder>
 </Solution>

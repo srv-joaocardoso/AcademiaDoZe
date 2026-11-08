@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.LogradouroListPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             xmlns:dto="clr-namespace:AcademiaDoZe.Application.DTOs;assembly=AcademiaDoZe.Application"
+             x:DataType="vm:LogradouroListViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Barra de busca com filtro -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorder}" Margin="16,12">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Picker Grid.Column="0" ItemsSource="{Binding FilterTypes}" SelectedItem="{Binding SelectedFilterType}"
+                        WidthRequest="110" TextColor="{StaticResource DraculaForeground}" VerticalOptions="Center" />
+                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Digite o valor..."
+                       ReturnCommand="{Binding SearchLogradourosCommand}" VerticalOptions="Center" />
+                <Button Grid.Column="2" Text="Buscar" Style="{StaticResource ButtonPrimary}"
+                        FontSize="14" HeightRequest="40" WidthRequest="90" Command="{Binding SearchLogradourosCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- Lista com botão flutuante de adicionar -->
+        <Grid Grid.Row="1">
+            <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+                <CollectionView ItemsSource="{Binding Logradouros}" SelectionMode="None" Margin="16,0">
+
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="16" Padding="20">
+                            <Label Text="Nenhum logradouro encontrado" HorizontalOptions="Center" FontSize="18" TextColor="{StaticResource DraculaComment}" />
+                            <Button Text="Adicionar primeiro logradouro" Command="{Binding AddLogradouroCommand}"
+                                    Style="{StaticResource ButtonPrimary}" HorizontalOptions="Center" Padding="24,0" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dto:LogradouroDto">
+                            <Border Style="{StaticResource CardBorder}" Margin="0,6">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="4">
+
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="10">
+                                        <Border BackgroundColor="{StaticResource DraculaPurple}" StrokeThickness="0" StrokeShape="RoundRectangle 6" Padding="8,2">
+                                            <Label Text="{Binding Cep}" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource DraculaBackground}" />
+                                        </Border>
+                                        <Label Text="{Binding Id, StringFormat='#{0}'}" FontSize="12" TextColor="{StaticResource DraculaComment}" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
+
+                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding Nome}" FontSize="17" FontAttributes="Bold" TextColor="{StaticResource DraculaForeground}" />
+
+                                    <Label Grid.Row="2" Grid.Column="0" TextColor="{StaticResource DraculaCyan}" FontSize="13">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Bairro}" />
+                                                <Span Text=" • " />
+                                                <Span Text="{Binding Cidade}" />
+                                                <Span Text=" - " />
+                                                <Span Text="{Binding Estado}" />
+                                                <Span Text=" • " />
+                                                <Span Text="{Binding Pais}" />
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+
+                                    <!-- Botões de ação -->
+                                    <VerticalStackLayout Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                        <Button Text="Editar" Style="{StaticResource ButtonSmall}" Clicked="OnEditButtonClicked" />
+                                        <Button Text="Excluir" Style="{StaticResource ButtonDanger}" Clicked="OnDeleteButtonClicked" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <!-- Floating Action Button -->
+            <Button Text="+" FontSize="28" Padding="0" Command="{Binding AddLogradouroCommand}"
+                    BackgroundColor="{StaticResource DraculaGreen}" TextColor="{StaticResource DraculaBackground}"
+                    CornerRadius="30" WidthRequest="60" HeightRequest="60"
+                    HorizontalOptions="End" VerticalOptions="End" Margin="24">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.5" />
+                </Button.Shadow>
+            </Button>
+        </Grid>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="0" Grid.RowSpan="2" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                           Color="{StaticResource DraculaPink}" VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

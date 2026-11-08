@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.DashboardListPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             x:DataType="vm:DashboardListViewModel"
+             Title="{Binding Title}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20" MaximumWidthRequest="900">
+
+                <!-- Cabeçalho -->
+                <Border Style="{StaticResource CardDestaque}" BackgroundColor="{StaticResource Black}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
+                        <Image Grid.Column="0" Source="academiadoze.png" HeightRequest="150" WidthRequest="150" />
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="6">
+                            <Label Text="Academia do Zé" FontSize="30" FontAttributes="Bold" TextColor="{StaticResource DraculaForeground}" />
+                            <Label Text="Sistema de Gerenciamento" FontSize="16" TextColor="{StaticResource DraculaPurple}" />
+                            <BoxView HeightRequest="3" WidthRequest="80" HorizontalOptions="Start" Color="{StaticResource DraculaGreen}" Margin="0,6" />
+                            <Label Text="Toque em um card para abrir a funcionalidade." FontSize="13" TextColor="{StaticResource DraculaComment}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Cards -->
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*" RowSpacing="16" ColumnSpacing="16">
+
+                    <!-- Card Logradouros -->
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardDestaque}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToLogradourosCommand}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding TotalLogradouros}" Style="{StaticResource CardTotal}" />
+                            <Label Text="Logradouros" Style="{StaticResource CardTitulo}" />
+                            <Label Text="abrir ›" HorizontalTextAlignment="Center" FontSize="12" TextColor="{StaticResource DraculaGreen}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Card Alunos -->
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToAlunosCommand}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding TotalAlunos}" Style="{StaticResource CardTotal}" TextColor="{StaticResource DraculaCyan}" />
+                            <Label Text="Alunos" Style="{StaticResource CardTitulo}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Card Colaboradores -->
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardBorder}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToColaboradoresCommand}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding TotalColaboradores}" Style="{StaticResource CardTotal}" TextColor="{StaticResource DraculaOrange}" />
+                            <Label Text="Colaboradores" Style="{StaticResource CardTitulo}" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Card Matrículas -->
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToMatriculasCommand}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding TotalMatriculas}" Style="{StaticResource CardTotal}" TextColor="{StaticResource DraculaYellow}" />
+                            <Label Text="Matrículas" Style="{StaticResource CardTitulo}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Label Text="João Victor Cardoso Gonçalves • 155953" HorizontalTextAlignment="Center" FontSize="12" TextColor="{StaticResource DraculaComment}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{StaticResource DraculaPink}"
+                           VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

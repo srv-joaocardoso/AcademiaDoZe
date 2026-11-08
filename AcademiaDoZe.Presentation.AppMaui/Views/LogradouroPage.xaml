@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.LogradouroPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             x:DataType="vm:LogradouroViewModel"
+             Title="{Binding Title}">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16" MaximumWidthRequest="700">
+
+                <!-- CEP -->
+                <Border Style="{StaticResource CardDestaque}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="CEP" Style="{StaticResource CampoTitulo}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Entry Grid.Column="0" Text="{Binding Logradouro.Cep}" Placeholder="00000-000" Keyboard="Numeric" />
+                            <Button Grid.Column="1" Text="Buscar CEP" Command="{Binding SearchByCepCommand}"
+                                    Style="{StaticResource ButtonPrimary}" HeightRequest="40" Padding="16,0" FontSize="14" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Dados do Logradouro -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="{Binding Logradouro.Id, StringFormat='Logradouro ID: {0}'}" FontSize="13" TextColor="{StaticResource DraculaComment}" />
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Nome / Rua" Style="{StaticResource CampoTitulo}" />
+                            <Entry Text="{Binding Logradouro.Nome}" Placeholder="Digite o nome da rua..." />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Bairro" Style="{StaticResource CampoTitulo}" />
+                            <Entry Text="{Binding Logradouro.Bairro}" Placeholder="Digite o bairro..." />
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,100" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="Cidade" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding Logradouro.Cidade}" Placeholder="Digite a cidade..." />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="UF" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding Logradouro.Estado}" Placeholder="SC" MaxLength="2" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="País" Style="{StaticResource CampoTitulo}" />
+                            <Entry Text="{Binding Logradouro.Pais}" Placeholder="Digite o país..." />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Botões de ação -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Grid.Column="0" Text="Cancelar" Command="{Binding CancelCommand}" Style="{StaticResource ButtonSecondary}" />
+                    <Button Grid.Column="1" Text="Salvar" Command="{Binding SaveLogradouroCommand}" Style="{StaticResource ButtonPrimary}" />
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{StaticResource DraculaPink}"
+                           VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

@@ -3,55 +3,87 @@
 using AcademiaDoZe.Application.DependencyInjection;
 using AcademiaDoZe.Application.Enums;
 using AcademiaDoZe.Application.Mappings;
+using AcademiaDoZe.Presentation.AppMaui.Message;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace AcademiaDoZe.Presentation.AppMaui.Configuration;
 
 public static class ConfigurationHelper
 {
+    // caminho padrão do SQLite no Windows, o mesmo usado nos testes de infraestrutura
+    public const string SqliteCaminhoPadraoWindows = @"C:\Users\timdf\Pessoal\Faculdade\Desenvolvimento de Sistemas II\AcademiaDoZe\db_academia_do_ze.db";
+
+    public static string SqliteCaminhoPadrao => DeviceInfo.Platform == DevicePlatform.WinUI
+        ? SqliteCaminhoPadraoWindows
+        : Path.Combine(FileSystem.AppDataDirectory, "db_academia_do_ze.db");
+
     public static void ConfigureServices(IServiceCollection services)
     {
-        // 1. Tipo de banco de dados: SqlServer, MySql ou Sqlite
-        var databaseType = AppDatabaseType.Sqlite;
+        var (connectionString, databaseType) = ObterConfiguracaoAtual();
 
-        // 2. Configuração da Connection String de acordo com o banco escolhido
+        var repoConfig = new RepositoryConfig
+        {
+            ConnectionString = connectionString,
+            DatabaseType = databaseType.ToInfrastructure()
+        };
+
+        // Configura a fábrica de repositórios com a string de conexão e tipo de banco
+        services.AddSingleton(repoConfig);
+
+        // Assina mensagens de alteração de banco de dados para atualizar o RepositoryConfig diretamente
+        WeakReferenceMessenger.Default.Register<RepositoryConfig, BancoPreferencesUpdatedMessage>(repoConfig, (r, m) =>
+        {
+            var (novaConnStr, novoDbType) = ObterConfiguracaoAtual();
+            r.ConnectionString = novaConnStr;
+            r.DatabaseType = novoDbType.ToInfrastructure();
+        });
+
+        // Configura os serviços da camada de aplicação
+        services.AddApplicationServices();
+    }
+
+    // Obtém a Connection String e o AppDatabaseType ativos a partir das Preferences do usuário,
+    // com valores padrão para cada um dos 3 gerenciadores (Sqlite, MySql e SqlServer).
+    public static (string ConnectionString, AppDatabaseType DatabaseType) ObterConfiguracaoAtual()
+    {
+        var databaseTypeStr = Preferences.Get("DatabaseType", AppDatabaseType.Sqlite.ToString());
+        if (!Enum.TryParse<AppDatabaseType>(databaseTypeStr, out var databaseType))
+        {
+            databaseType = AppDatabaseType.Sqlite;
+        }
+
         string connectionString;
         if (databaseType == AppDatabaseType.Sqlite)
         {
-            var dbPath = DeviceInfo.Platform == DevicePlatform.WinUI
-                ? @"C:\Users\timdf\Pessoal\Faculdade\Desenvolvimento de Sistemas II\AcademiaDoZe\db_academia_do_ze.db"
-                : Path.Combine(FileSystem.AppDataDirectory, "db_academia_do_ze.db");
+            var dbPath = Preferences.Get("Sqlite_Caminho", SqliteCaminhoPadrao);
+            if (string.IsNullOrWhiteSpace(dbPath))
+                dbPath = SqliteCaminhoPadrao;
 
-            connectionString = $"Data Source={dbPath};Default Timeout=5;";
+            var complemento = Preferences.Get("Sqlite_Complemento", PadraoComplemento(AppDatabaseType.Sqlite));
+            connectionString = $"Data Source={dbPath};{complemento}";
         }
         else
         {
-            const string dbServer = "localhost";
-            const string dbDatabase = "db_academia_do_ze";
-            const string dbUser = "root";
-            const string dbPassword = "abcBolinhas12345";
+            var prefix = databaseType.ToString();
 
-            // ajuste do complemento de acordo com o tipo de banco de dados escolhido
-            string dbComplemento = string.Empty;
-            if (databaseType == AppDatabaseType.SqlServer)
-            {
-                dbComplemento = "TrustServerCertificate=True;Encrypt=True;Connect Timeout=5;Connection Timeout=5;";
-            }
-            else if (databaseType == AppDatabaseType.MySql)
-            {
-                dbComplemento = "Connection Timeout=5;Default Command Timeout=30;AllowPublicKeyRetrieval=True;SslMode=Disabled;";
-            }
+            var dbServer = Preferences.Get($"{prefix}_Servidor", "localhost");
+            var dbDatabase = Preferences.Get($"{prefix}_Banco", "db_academia_do_ze");
+            var dbUser = Preferences.Get($"{prefix}_Usuario", PadraoUsuario(databaseType));
+            var dbPassword = Preferences.Get($"{prefix}_Senha", "abcBolinhas12345");
+            var dbComplemento = Preferences.Get($"{prefix}_Complemento", PadraoComplemento(databaseType));
 
             connectionString = $"Server={dbServer};Database={dbDatabase};User Id={dbUser};Password={dbPassword};{dbComplemento}";
         }
 
-        // 3. Configura a fábrica de repositórios com a string de conexão e tipo de banco
-        services.AddSingleton(new RepositoryConfig
-        {
-            ConnectionString = connectionString,
-            DatabaseType = databaseType.ToInfrastructure()
-        });
-
-        // 4. Configura os serviços da camada de aplicação
-        services.AddApplicationServices();
+        return (connectionString, databaseType);
     }
+
+    public static string PadraoUsuario(AppDatabaseType tipo) => tipo == AppDatabaseType.SqlServer ? "sa" : "root";
+
+    public static string PadraoComplemento(AppDatabaseType tipo) => tipo switch
+    {
+        AppDatabaseType.SqlServer => "TrustServerCertificate=True;Encrypt=True;Connect Timeout=5;Connection Timeout=5;",
+        AppDatabaseType.MySql => "Connection Timeout=5;Default Command Timeout=30;AllowPublicKeyRetrieval=True;SslMode=Disabled;",
+        _ => "Default Timeout=5;"
+    };
 }

@@ -11,14 +11,18 @@
             <VerticalStackLayout Padding="20" Spacing="20" MaximumWidthRequest="900">
 
                 <!-- Cabeçalho -->
-                <Border Style="{StaticResource CardDestaque}" BackgroundColor="{StaticResource Black}">
+                <Border Style="{StaticResource CardDestaque}" BackgroundColor="{AppThemeBinding Light={StaticResource AlucardFloor}, Dark={StaticResource Black}}">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
-                        <Image Grid.Column="0" Source="academiadoze.png" HeightRequest="150" WidthRequest="150" />
+                        <Image Grid.Column="0" HeightRequest="150" WidthRequest="150">
+                            <Image.Source>
+                                <AppThemeBinding Light="academiadoze_claro.png" Dark="academiadoze.png" />
+                            </Image.Source>
+                        </Image>
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="6">
-                            <Label Text="Academia do Zé" FontSize="30" FontAttributes="Bold" TextColor="{StaticResource DraculaForeground}" />
-                            <Label Text="Sistema de Gerenciamento" FontSize="16" TextColor="{StaticResource DraculaPurple}" />
-                            <BoxView HeightRequest="3" WidthRequest="80" HorizontalOptions="Start" Color="{StaticResource DraculaGreen}" Margin="0,6" />
-                            <Label Text="Toque em um card para abrir a funcionalidade." FontSize="13" TextColor="{StaticResource DraculaComment}" />
+                            <Label Text="Academia do Zé" FontSize="30" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AlucardForeground}, Dark={StaticResource DraculaForeground}}" />
+                            <Label Text="Sistema de Gerenciamento" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}" />
+                            <BoxView HeightRequest="3" WidthRequest="80" HorizontalOptions="Start" Color="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" Margin="0,6" />
+                            <Label Text="Toque em um card para abrir a funcionalidade." FontSize="13" TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -32,9 +36,10 @@
                             <TapGestureRecognizer Command="{Binding NavigateToLogradourosCommand}" />
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="6">
+                            <Label Text="&#xe7f1;" Style="{StaticResource CardIcone}" TextColor="{AppThemeBinding Light={StaticResource AlucardPink}, Dark={StaticResource DraculaPink}}" />
                             <Label Text="{Binding TotalLogradouros}" Style="{StaticResource CardTotal}" />
                             <Label Text="Logradouros" Style="{StaticResource CardTitulo}" />
-                            <Label Text="abrir ›" HorizontalTextAlignment="Center" FontSize="12" TextColor="{StaticResource DraculaGreen}" />
+                            <Label Text="abrir ›" HorizontalTextAlignment="Center" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -44,7 +49,8 @@
                             <TapGestureRecognizer Command="{Binding NavigateToAlunosCommand}" />
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding TotalAlunos}" Style="{StaticResource CardTotal}" TextColor="{StaticResource DraculaCyan}" />
+                            <Label Text="&#xe80c;" Style="{StaticResource CardIcone}" TextColor="{AppThemeBinding Light={StaticResource AlucardCyan}, Dark={StaticResource DraculaCyan}}" />
+                            <Label Text="{Binding TotalAlunos}" Style="{StaticResource CardTotal}" TextColor="{AppThemeBinding Light={StaticResource AlucardCyan}, Dark={StaticResource DraculaCyan}}" />
                             <Label Text="Alunos" Style="{StaticResource CardTitulo}" />
                         </VerticalStackLayout>
                     </Border>
@@ -55,7 +61,8 @@
                             <TapGestureRecognizer Command="{Binding NavigateToColaboradoresCommand}" />
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding TotalColaboradores}" Style="{StaticResource CardTotal}" TextColor="{StaticResource DraculaOrange}" />
+                            <Label Text="&#xea67;" Style="{StaticResource CardIcone}" TextColor="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}" />
+                            <Label Text="{Binding TotalColaboradores}" Style="{StaticResource CardTotal}" TextColor="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}" />
                             <Label Text="Colaboradores" Style="{StaticResource CardTitulo}" />
                         </VerticalStackLayout>
                     </Border>
@@ -66,18 +73,19 @@
                             <TapGestureRecognizer Command="{Binding NavigateToMatriculasCommand}" />
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding TotalMatriculas}" Style="{StaticResource CardTotal}" TextColor="{StaticResource DraculaYellow}" />
+                            <Label Text="&#xefec;" Style="{StaticResource CardIcone}" TextColor="{AppThemeBinding Light={StaticResource AlucardYellow}, Dark={StaticResource DraculaYellow}}" />
+                            <Label Text="{Binding TotalMatriculas}" Style="{StaticResource CardTotal}" TextColor="{AppThemeBinding Light={StaticResource AlucardYellow}, Dark={StaticResource DraculaYellow}}" />
                             <Label Text="Matrículas" Style="{StaticResource CardTitulo}" />
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
 
-                <Label Text="João Victor Cardoso Gonçalves • 155953" HorizontalTextAlignment="Center" FontSize="12" TextColor="{StaticResource DraculaComment}" />
+                <Label Text="João Victor Cardoso Gonçalves • 155953" HorizontalTextAlignment="Center" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
             </VerticalStackLayout>
         </ScrollView>
 
         <!-- Loading Indicator -->
-        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{StaticResource DraculaPink}"
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{AppThemeBinding Light={StaticResource AlucardPink}, Dark={StaticResource DraculaPink}}"
                            VerticalOptions="Center" HorizontalOptions="Center" />
     </Grid>
 </ContentPage>

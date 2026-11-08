@@ -28,7 +28,7 @@ public class ColaboradorService : IColaboradorService
         var cpfResult = Cpf.Criar(cpf);
         if (cpfResult.IsFailure) return false;
 
-        return await _repoFactory().CpfJaExiste(cpfResult.Value!, id, cancellationToken);
+        return await _repoFactory.Usar(r => r.CpfJaExiste(cpfResult.Value!, id, cancellationToken));
     }
 
     public async Task<bool> EmailJaExisteAsync(string email, int? id = null, CancellationToken cancellationToken = default)
@@ -38,17 +38,17 @@ public class ColaboradorService : IColaboradorService
         var emailResult = Email.Criar(email);
         if (emailResult.IsFailure) return false;
 
-        return await _repoFactory().EmailJaExiste(emailResult.Value!, id, cancellationToken);
+        return await _repoFactory.Usar(r => r.EmailJaExiste(emailResult.Value!, id, cancellationToken));
     }
 
     public async Task<ColaboradorDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var colaborador = await _repoFactory().ObterPorId(id, cancellationToken);
+        var colaborador = await _repoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
         if (colaborador == null) return null;
 
         if (_logradouroRepoFactory != null)
         {
-            var logradouro = await _logradouroRepoFactory().ObterPorId(colaborador.Endereco.LogradouroId, cancellationToken);
+            var logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(colaborador.Endereco.LogradouroId, cancellationToken));
             return colaborador.ToDto(logradouro);
         }
 
@@ -57,7 +57,7 @@ public class ColaboradorService : IColaboradorService
 
     public async Task<IEnumerable<ColaboradorDto>> ObterTodosAsync(CancellationToken cancellationToken = default)
     {
-        var colaboradores = (await _repoFactory().ObterTodos(cancellationToken)).ToList();
+        var colaboradores = (await _repoFactory.Usar(r => r.ObterTodos(cancellationToken))).ToList();
         if (colaboradores.Count == 0) return [];
 
         if (_logradouroRepoFactory != null)
@@ -66,7 +66,7 @@ public class ColaboradorService : IColaboradorService
             var logradouros = new Dictionary<int, Domain.Entities.Logradouro>();
             foreach (var logId in logradouroIds)
             {
-                var log = await _logradouroRepoFactory().ObterPorId(logId, cancellationToken);
+                var log = await _logradouroRepoFactory.Usar(r => r.ObterPorId(logId, cancellationToken));
                 if (log != null) logradouros[logId] = log;
             }
 
@@ -78,13 +78,13 @@ public class ColaboradorService : IColaboradorService
 
     public async Task<bool> RemoverAsync(int id, CancellationToken cancellationToken = default)
     {
-        var colaborador = await _repoFactory().ObterPorId(id, cancellationToken);
+        var colaborador = await _repoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
         if (colaborador == null)
         {
             return false;
         }
 
-        return await _repoFactory().Remover(id, cancellationToken);
+        return await _repoFactory.Usar(r => r.Remover(id, cancellationToken));
     }
 
     public async Task<ColaboradorDto?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default)
@@ -96,7 +96,7 @@ public class ColaboradorService : IColaboradorService
         if (cpfResult.IsFailure)
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(cpf));
 
-        var colaborador = await _repoFactory().ObterPorCpf(cpfResult.Value!, cancellationToken);
+        var colaborador = await _repoFactory.Usar(r => r.ObterPorCpf(cpfResult.Value!, cancellationToken));
         return colaborador?.ToDto();
     }
 
@@ -109,19 +109,19 @@ public class ColaboradorService : IColaboradorService
         if (emailResult.IsFailure)
             throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(email));
 
-        var colaborador = await _repoFactory().ObterPorEmail(emailResult.Value!, cancellationToken);
+        var colaborador = await _repoFactory.Usar(r => r.ObterPorEmail(emailResult.Value!, cancellationToken));
         return colaborador?.ToDto();
     }
 
     public async Task<IEnumerable<ColaboradorDto>> ObterPorTipoAsync(AppColaboradorTipo tipo, CancellationToken cancellationToken = default)
     {
-        var colaboradores = await _repoFactory().ObterPorTipo(tipo.ToDomain(), cancellationToken);
+        var colaboradores = await _repoFactory.Usar(r => r.ObterPorTipo(tipo.ToDomain(), cancellationToken));
         return [.. colaboradores.Select(c => c.ToDto())];
     }
 
     public async Task<IEnumerable<ColaboradorDto>> ObterPorVinculoAsync(AppColaboradorVinculo vinculo, CancellationToken cancellationToken = default)
     {
-        var colaboradores = await _repoFactory().ObterPorVinculo(vinculo.ToDomain(), cancellationToken);
+        var colaboradores = await _repoFactory.Usar(r => r.ObterPorVinculo(vinculo.ToDomain(), cancellationToken));
         return [.. colaboradores.Select(c => c.ToDto())];
     }
 
@@ -143,7 +143,7 @@ public class ColaboradorService : IColaboradorService
             throw new InvalidOperationException("Falha ao gerar hash da nova senha.");
         }
 
-        return await _repoFactory().TrocarSenha(id, senhaHashVO.Value!, cancellationToken);
+        return await _repoFactory.Usar(r => r.TrocarSenha(id, senhaHashVO.Value!, cancellationToken));
     }
 
     public async Task<ColaboradorDto> AdicionarAsync(ColaboradorDto colaboradorDto, CancellationToken cancellationToken = default)
@@ -156,7 +156,7 @@ public class ColaboradorService : IColaboradorService
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(colaboradorDto));
         }
 
-        if (await _repoFactory().CpfJaExiste(cpfResult.Value!, null, cancellationToken))
+        if (await _repoFactory.Usar(r => r.CpfJaExiste(cpfResult.Value!, null, cancellationToken)))
         {
             throw new InvalidOperationException($"Já existe um colaborador cadastrado com o CPF {colaboradorDto.Cpf}.");
         }
@@ -169,7 +169,7 @@ public class ColaboradorService : IColaboradorService
                 throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(colaboradorDto));
             }
 
-            if (await _repoFactory().EmailJaExiste(emailResult.Value!, null, cancellationToken))
+            if (await _repoFactory.Usar(r => r.EmailJaExiste(emailResult.Value!, null, cancellationToken)))
             {
                 throw new InvalidOperationException($"Já existe um colaborador cadastrado com o Email {colaboradorDto.Email}.");
             }
@@ -189,12 +189,12 @@ public class ColaboradorService : IColaboradorService
         Domain.Entities.Logradouro? logradouro = null;
         if (_logradouroRepoFactory != null && colaboradorDto.Endereco != null && colaboradorDto.Endereco.Id > 0)
         {
-            logradouro = await _logradouroRepoFactory().ObterPorId(colaboradorDto.Endereco.Id, cancellationToken)
+            logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(colaboradorDto.Endereco.Id, cancellationToken))
                 ?? throw new KeyNotFoundException($"Logradouro com ID {colaboradorDto.Endereco.Id} não encontrado.");
         }
 
         var colaborador = colaboradorDto.ToEntity(logradouro);
-        var adicionado = await _repoFactory().Adicionar(colaborador, cancellationToken);
+        var adicionado = await _repoFactory.Usar(r => r.Adicionar(colaborador, cancellationToken));
         return adicionado.ToDto(logradouro);
     }
 
@@ -202,7 +202,7 @@ public class ColaboradorService : IColaboradorService
     {
         ArgumentNullException.ThrowIfNull(colaboradorDto);
 
-        var colaboradorExistente = await _repoFactory().ObterPorId(colaboradorDto.Id, cancellationToken)
+        var colaboradorExistente = await _repoFactory.Usar(r => r.ObterPorId(colaboradorDto.Id, cancellationToken))
             ?? throw new KeyNotFoundException($"Colaborador com ID {colaboradorDto.Id} não encontrado.");
 
         var cpfResult = Cpf.Criar(colaboradorDto.Cpf);
@@ -211,7 +211,7 @@ public class ColaboradorService : IColaboradorService
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(colaboradorDto));
         }
 
-        if (await _repoFactory().CpfJaExiste(cpfResult.Value!, colaboradorDto.Id, cancellationToken))
+        if (await _repoFactory.Usar(r => r.CpfJaExiste(cpfResult.Value!, colaboradorDto.Id, cancellationToken)))
         {
             throw new InvalidOperationException($"Já existe outro colaborador cadastrado com o CPF {colaboradorDto.Cpf}.");
         }
@@ -224,7 +224,7 @@ public class ColaboradorService : IColaboradorService
                 throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(colaboradorDto));
             }
 
-            if (await _repoFactory().EmailJaExiste(emailResult.Value!, colaboradorDto.Id, cancellationToken))
+            if (await _repoFactory.Usar(r => r.EmailJaExiste(emailResult.Value!, colaboradorDto.Id, cancellationToken)))
             {
                 throw new InvalidOperationException($"Já existe outro colaborador cadastrado com o Email {colaboradorDto.Email}.");
             }
@@ -248,12 +248,12 @@ public class ColaboradorService : IColaboradorService
 
         if (_logradouroRepoFactory != null && logradouroId > 0)
         {
-            logradouro = await _logradouroRepoFactory().ObterPorId(logradouroId, cancellationToken)
+            logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(logradouroId, cancellationToken))
                 ?? throw new KeyNotFoundException($"Logradouro com ID {logradouroId} não encontrado.");
         }
 
         var colaboradorAtualizado = colaboradorExistente.UpdateFromDto(colaboradorDto, logradouro);
-        var atualizado = await _repoFactory().Atualizar(colaboradorAtualizado, cancellationToken);
+        var atualizado = await _repoFactory.Usar(r => r.Atualizar(colaboradorAtualizado, cancellationToken));
         return atualizado.ToDto(logradouro);
     }
 }

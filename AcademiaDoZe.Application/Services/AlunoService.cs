@@ -27,7 +27,7 @@ public class AlunoService : IAlunoService
         var cpfResult = Cpf.Criar(cpf);
         if (cpfResult.IsFailure) return false;
 
-        return await _repoFactory().CpfJaExiste(cpfResult.Value!, id, cancellationToken);
+        return await _repoFactory.Usar(r => r.CpfJaExiste(cpfResult.Value!, id, cancellationToken));
     }
 
     public async Task<bool> EmailJaExisteAsync(string email, int? id = null, CancellationToken cancellationToken = default)
@@ -37,17 +37,17 @@ public class AlunoService : IAlunoService
         var emailResult = Email.Criar(email);
         if (emailResult.IsFailure) return false;
 
-        return await _repoFactory().EmailJaExiste(emailResult.Value!, id, cancellationToken);
+        return await _repoFactory.Usar(r => r.EmailJaExiste(emailResult.Value!, id, cancellationToken));
     }
 
     public async Task<AlunoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var aluno = await _repoFactory().ObterPorId(id, cancellationToken);
+        var aluno = await _repoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
         if (aluno == null) return null;
 
         if (_logradouroRepoFactory != null)
         {
-            var logradouro = await _logradouroRepoFactory().ObterPorId(aluno.Endereco.LogradouroId, cancellationToken);
+            var logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(aluno.Endereco.LogradouroId, cancellationToken));
             return aluno.ToDto(logradouro);
         }
 
@@ -56,7 +56,7 @@ public class AlunoService : IAlunoService
 
     public async Task<IEnumerable<AlunoDto>> ObterTodosAsync(CancellationToken cancellationToken = default)
     {
-        var alunos = (await _repoFactory().ObterTodos(cancellationToken)).ToList();
+        var alunos = (await _repoFactory.Usar(r => r.ObterTodos(cancellationToken))).ToList();
         if (alunos.Count == 0) return [];
 
         if (_logradouroRepoFactory != null)
@@ -65,7 +65,7 @@ public class AlunoService : IAlunoService
             var logradouros = new Dictionary<int, Domain.Entities.Logradouro>();
             foreach (var logId in logradouroIds)
             {
-                var log = await _logradouroRepoFactory().ObterPorId(logId, cancellationToken);
+                var log = await _logradouroRepoFactory.Usar(r => r.ObterPorId(logId, cancellationToken));
                 if (log != null) logradouros[logId] = log;
             }
 
@@ -84,19 +84,19 @@ public class AlunoService : IAlunoService
         if (cpfResult.IsFailure)
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(cpf));
 
-        var aluno = await _repoFactory().ObterPorCpf(cpfResult.Value!, cancellationToken);
+        var aluno = await _repoFactory.Usar(r => r.ObterPorCpf(cpfResult.Value!, cancellationToken));
         return aluno?.ToDto();
     }
 
     public async Task<bool> RemoverAsync(int id, CancellationToken cancellationToken = default)
     {
-        var aluno = await _repoFactory().ObterPorId(id, cancellationToken);
+        var aluno = await _repoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
         if (aluno == null)
         {
             return false;
         }
 
-        return await _repoFactory().Remover(id, cancellationToken);
+        return await _repoFactory.Usar(r => r.Remover(id, cancellationToken));
     }
 
     public async Task<AlunoDto?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -108,7 +108,7 @@ public class AlunoService : IAlunoService
         if (emailResult.IsFailure)
             throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(email));
 
-        var aluno = await _repoFactory().ObterPorEmail(emailResult.Value!, cancellationToken);
+        var aluno = await _repoFactory.Usar(r => r.ObterPorEmail(emailResult.Value!, cancellationToken));
         return aluno?.ToDto();
     }
 
@@ -117,7 +117,7 @@ public class AlunoService : IAlunoService
         if (string.IsNullOrWhiteSpace(nome))
             throw new ArgumentException("Nome não pode ser vazio.", nameof(nome));
 
-        var alunos = await _repoFactory().ObterPorNome(nome.Trim(), cancellationToken);
+        var alunos = await _repoFactory.Usar(r => r.ObterPorNome(nome.Trim(), cancellationToken));
         return [.. alunos.Select(a => a.ToDto())];
     }
 
@@ -139,7 +139,7 @@ public class AlunoService : IAlunoService
             throw new InvalidOperationException("Falha ao gerar hash da nova senha.");
         }
 
-        return await _repoFactory().TrocarSenha(id, senhaHashVO.Value!, cancellationToken);
+        return await _repoFactory.Usar(r => r.TrocarSenha(id, senhaHashVO.Value!, cancellationToken));
     }
 
     public async Task<AlunoDto> AdicionarAsync(AlunoDto alunoDto, CancellationToken cancellationToken = default)
@@ -152,7 +152,7 @@ public class AlunoService : IAlunoService
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(alunoDto));
         }
 
-        if (await _repoFactory().CpfJaExiste(cpfResult.Value!, null, cancellationToken))
+        if (await _repoFactory.Usar(r => r.CpfJaExiste(cpfResult.Value!, null, cancellationToken)))
         {
             throw new InvalidOperationException($"Já existe um aluno cadastrado com o CPF {alunoDto.Cpf}.");
         }
@@ -165,7 +165,7 @@ public class AlunoService : IAlunoService
                 throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(alunoDto));
             }
 
-            if (await _repoFactory().EmailJaExiste(emailResult.Value!, null, cancellationToken))
+            if (await _repoFactory.Usar(r => r.EmailJaExiste(emailResult.Value!, null, cancellationToken)))
             {
                 throw new InvalidOperationException($"Já existe um aluno cadastrado com o Email {alunoDto.Email}.");
             }
@@ -185,12 +185,12 @@ public class AlunoService : IAlunoService
         Domain.Entities.Logradouro? logradouro = null;
         if (_logradouroRepoFactory != null && alunoDto.Endereco != null && alunoDto.Endereco.Id > 0)
         {
-            logradouro = await _logradouroRepoFactory().ObterPorId(alunoDto.Endereco.Id, cancellationToken)
+            logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(alunoDto.Endereco.Id, cancellationToken))
                 ?? throw new KeyNotFoundException($"Logradouro com ID {alunoDto.Endereco.Id} não encontrado.");
         }
 
         var aluno = alunoDto.ToEntity(logradouro);
-        var adicionado = await _repoFactory().Adicionar(aluno, cancellationToken);
+        var adicionado = await _repoFactory.Usar(r => r.Adicionar(aluno, cancellationToken));
         return adicionado.ToDto(logradouro);
     }
 
@@ -198,7 +198,7 @@ public class AlunoService : IAlunoService
     {
         ArgumentNullException.ThrowIfNull(alunoDto);
 
-        var alunoExistente = await _repoFactory().ObterPorId(alunoDto.Id, cancellationToken)
+        var alunoExistente = await _repoFactory.Usar(r => r.ObterPorId(alunoDto.Id, cancellationToken))
             ?? throw new KeyNotFoundException($"Aluno com ID {alunoDto.Id} não encontrado.");
 
         var cpfResult = Cpf.Criar(alunoDto.Cpf);
@@ -207,7 +207,7 @@ public class AlunoService : IAlunoService
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(alunoDto));
         }
 
-        if (await _repoFactory().CpfJaExiste(cpfResult.Value!, alunoDto.Id, cancellationToken))
+        if (await _repoFactory.Usar(r => r.CpfJaExiste(cpfResult.Value!, alunoDto.Id, cancellationToken)))
         {
             throw new InvalidOperationException($"Já existe outro aluno cadastrado com o CPF {alunoDto.Cpf}.");
         }
@@ -220,7 +220,7 @@ public class AlunoService : IAlunoService
                 throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(alunoDto));
             }
 
-            if (await _repoFactory().EmailJaExiste(emailResult.Value!, alunoDto.Id, cancellationToken))
+            if (await _repoFactory.Usar(r => r.EmailJaExiste(emailResult.Value!, alunoDto.Id, cancellationToken)))
             {
                 throw new InvalidOperationException($"Já existe outro aluno cadastrado com o Email {alunoDto.Email}.");
             }
@@ -244,12 +244,12 @@ public class AlunoService : IAlunoService
 
         if (_logradouroRepoFactory != null && logradouroId > 0)
         {
-            logradouro = await _logradouroRepoFactory().ObterPorId(logradouroId, cancellationToken)
+            logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(logradouroId, cancellationToken))
                 ?? throw new KeyNotFoundException($"Logradouro com ID {logradouroId} não encontrado.");
         }
 
         var alunoAtualizado = alunoExistente.UpdateFromDto(alunoDto, logradouro);
-        var atualizado = await _repoFactory().Atualizar(alunoAtualizado, cancellationToken);
+        var atualizado = await _repoFactory.Usar(r => r.Atualizar(alunoAtualizado, cancellationToken));
         return atualizado.ToDto(logradouro);
     }
 }

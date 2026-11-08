@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Tema Dracula - https://draculatheme.com/contribute -->
+    <Color x:Key="DraculaBackground">#282A36</Color>
+    <Color x:Key="DraculaCurrentLine">#44475A</Color>
+    <Color x:Key="DraculaForeground">#F8F8F2</Color>
+    <Color x:Key="DraculaComment">#6272A4</Color>
+    <Color x:Key="DraculaCyan">#8BE9FD</Color>
+    <Color x:Key="DraculaGreen">#50FA7B</Color>
+    <Color x:Key="DraculaOrange">#FFB86C</Color>
+    <Color x:Key="DraculaPink">#FF79C6</Color>
+    <Color x:Key="DraculaPurple">#BD93F9</Color>
+    <Color x:Key="DraculaRed">#FF5555</Color>
+    <Color x:Key="DraculaYellow">#F1FA8C</Color>
+
+    <!-- cores do template trocadas pelas do Dracula -->
+    <Color x:Key="Primary">#BD93F9</Color>
+    <Color x:Key="PrimaryDark">#BD93F9</Color>
+    <Color x:Key="PrimaryDarkText">#282A36</Color>
+    <Color x:Key="Secondary">#44475A</Color>
+    <Color x:Key="SecondaryDarkText">#FF79C6</Color>
+    <Color x:Key="Tertiary">#FF79C6</Color>
+
+    <Color x:Key="White">#F8F8F2</Color>
+    <Color x:Key="Black">#21222C</Color>
+    <Color x:Key="Magenta">#FF5555</Color>
+    <Color x:Key="MidnightBlue">#44475A</Color>
+    <Color x:Key="OffBlack">#282A36</Color>
+
+    <Color x:Key="Gray100">#F8F8F2</Color>
+    <Color x:Key="Gray200">#E2E2DC</Color>
+    <Color x:Key="Gray300">#B4B8CF</Color>
+    <Color x:Key="Gray400">#8A93BD</Color>
+    <Color x:Key="Gray500">#6272A4</Color>
+    <Color x:Key="Gray600">#44475A</Color>
+    <Color x:Key="Gray900">#343746</Color>
+    <Color x:Key="Gray950">#21222C</Color>
+
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
+    <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
+    <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource White}"/>
+    <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource Black}"/>
+
+    <SolidColorBrush x:Key="Gray100Brush" Color="{StaticResource Gray100}"/>
+    <SolidColorBrush x:Key="Gray200Brush" Color="{StaticResource Gray200}"/>
+    <SolidColorBrush x:Key="Gray300Brush" Color="{StaticResource Gray300}"/>
+    <SolidColorBrush x:Key="Gray400Brush" Color="{StaticResource Gray400}"/>
+    <SolidColorBrush x:Key="Gray500Brush" Color="{StaticResource Gray500}"/>
+    <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
+    <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
+    <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+</ResourceDictionary>

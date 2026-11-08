@@ -26,18 +26,18 @@ public class LogradouroService : ILogradouroService
         var cepResult = Cep.Criar(cep);
         if (cepResult.IsFailure) return false;
 
-        return await _repoFactory().CepJaExiste(cepResult.Value!, id, cancellationToken);
+        return await _repoFactory.Usar(r => r.CepJaExiste(cepResult.Value!, id, cancellationToken));
     }
 
     public async Task<LogradouroDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        var logradouro = await _repoFactory().ObterPorId(id, cancellationToken);
+        var logradouro = await _repoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
         return logradouro?.ToDto();
     }
 
     public async Task<IEnumerable<LogradouroDto>> ObterTodosAsync(CancellationToken cancellationToken = default)
     {
-        var logradouros = await _repoFactory().ObterTodos(cancellationToken);
+        var logradouros = await _repoFactory.Usar(r => r.ObterTodos(cancellationToken));
         return [.. logradouros.Select(l => l.ToDto())]; // expressão de interpolação para criar uma nova lista de DTOs
     }
 
@@ -50,7 +50,7 @@ public class LogradouroService : ILogradouroService
         if (cepResult.IsFailure)
             throw new ArgumentException($"CEP inválido: {string.Join(", ", cepResult.Notifications.Select(n => n.Mensagem))}", nameof(cep));
 
-        var logradouro = await _repoFactory().ObterPorCep(cepResult.Value!, cancellationToken);
+        var logradouro = await _repoFactory.Usar(r => r.ObterPorCep(cepResult.Value!, cancellationToken));
         return logradouro?.ToDto();
     }
 
@@ -59,7 +59,7 @@ public class LogradouroService : ILogradouroService
         if (string.IsNullOrWhiteSpace(cidade))
             throw new ArgumentException("Cidade não pode ser vazia.", nameof(cidade));
 
-        var logradouros = await _repoFactory().ObterPorCidade(cidade.Trim(), cancellationToken);
+        var logradouros = await _repoFactory.Usar(r => r.ObterPorCidade(cidade.Trim(), cancellationToken));
         return [.. logradouros.Select(l => l.ToDto())];
     }
 
@@ -70,7 +70,7 @@ public class LogradouroService : ILogradouroService
         if (string.IsNullOrWhiteSpace(bairro))
             throw new ArgumentException("Bairro não pode ser vazio.", nameof(bairro));
 
-        var logradouros = await _repoFactory().ObterPorBairro(cidade.Trim(), bairro.Trim(), cancellationToken);
+        var logradouros = await _repoFactory.Usar(r => r.ObterPorBairro(cidade.Trim(), bairro.Trim(), cancellationToken));
         return [.. logradouros.Select(l => l.ToDto())];
     }
 
@@ -84,13 +84,13 @@ public class LogradouroService : ILogradouroService
             throw new ArgumentException($"CEP inválido: {string.Join(", ", cepResult.Notifications.Select(n => n.Mensagem))}", nameof(logradouroDto));
         }
 
-        if (await _repoFactory().CepJaExiste(cepResult.Value!, null, cancellationToken))
+        if (await _repoFactory.Usar(r => r.CepJaExiste(cepResult.Value!, null, cancellationToken)))
         {
             throw new InvalidOperationException($"Já existe um logradouro cadastrado com o CEP {logradouroDto.Cep}.");
         }
 
         var logradouro = logradouroDto.ToEntity();
-        var adicionado = await _repoFactory().Adicionar(logradouro, cancellationToken);
+        var adicionado = await _repoFactory.Usar(r => r.Adicionar(logradouro, cancellationToken));
         return adicionado.ToDto();
     }
 
@@ -98,7 +98,7 @@ public class LogradouroService : ILogradouroService
     {
         ArgumentNullException.ThrowIfNull(logradouroDto);
 
-        var logradouroExistente = await _repoFactory().ObterPorId(logradouroDto.Id, cancellationToken)
+        var logradouroExistente = await _repoFactory.Usar(r => r.ObterPorId(logradouroDto.Id, cancellationToken))
             ?? throw new KeyNotFoundException($"Logradouro com ID {logradouroDto.Id} não encontrado.");
 
         var cepResult = Cep.Criar(logradouroDto.Cep);
@@ -107,24 +107,24 @@ public class LogradouroService : ILogradouroService
             throw new ArgumentException($"CEP inválido: {string.Join(", ", cepResult.Notifications.Select(n => n.Mensagem))}", nameof(logradouroDto));
         }
 
-        if (await _repoFactory().CepJaExiste(cepResult.Value!, logradouroDto.Id, cancellationToken))
+        if (await _repoFactory.Usar(r => r.CepJaExiste(cepResult.Value!, logradouroDto.Id, cancellationToken)))
         {
             throw new InvalidOperationException($"Já existe outro logradouro cadastrado com o CEP {logradouroDto.Cep}.");
         }
 
         var logradouroAtualizado = logradouroExistente.UpdateFromDto(logradouroDto);
-        var atualizado = await _repoFactory().Atualizar(logradouroAtualizado, cancellationToken);
+        var atualizado = await _repoFactory.Usar(r => r.Atualizar(logradouroAtualizado, cancellationToken));
         return atualizado.ToDto();
     }
 
     public async Task<bool> RemoverAsync(int id, CancellationToken cancellationToken = default)
     {
-        var logradouro = await _repoFactory().ObterPorId(id, cancellationToken);
+        var logradouro = await _repoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
         if (logradouro == null)
         {
             return false;
         }
 
-        return await _repoFactory().Remover(id, cancellationToken);
+        return await _repoFactory.Usar(r => r.Remover(id, cancellationToken));
     }
 }

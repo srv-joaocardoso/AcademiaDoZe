@@ -5,23 +5,40 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:AcademiaDoZe.Presentation.AppMaui.Views"
     Title="Academia do Zé"
-    FlyoutBackgroundColor="{StaticResource DraculaBackground}"
+    FlyoutBackgroundColor="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}"
     FlyoutBehavior="Flyout">
 
     <Shell.FlyoutHeader>
-        <VerticalStackLayout Padding="20" Spacing="8" BackgroundColor="{StaticResource Black}">
-            <Image Source="academiadoze.png" HeightRequest="110" WidthRequest="110" />
-            <Label Text="Academia do Zé" HorizontalTextAlignment="Center" FontAttributes="Bold" FontSize="18" TextColor="{StaticResource DraculaForeground}" />
-            <Label Text="João Victor Cardoso Gonçalves" HorizontalTextAlignment="Center" FontSize="12" TextColor="{StaticResource DraculaComment}" />
+        <VerticalStackLayout Padding="20" Spacing="8" BackgroundColor="{AppThemeBinding Light={StaticResource AlucardFloor}, Dark={StaticResource Black}}">
+            <Image HeightRequest="110" WidthRequest="110">
+                <Image.Source>
+                    <AppThemeBinding Light="academiadoze_claro.png" Dark="academiadoze.png" />
+                </Image.Source>
+            </Image>
+            <Label Text="Academia do Zé" HorizontalTextAlignment="Center" FontAttributes="Bold" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource AlucardForeground}, Dark={StaticResource DraculaForeground}}" />
+            <Label Text="João Victor Cardoso Gonçalves" HorizontalTextAlignment="Center" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
         </VerticalStackLayout>
     </Shell.FlyoutHeader>
 
     <FlyoutItem Title="Dashboard">
+        <FlyoutItem.Icon>
+            <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe871;" Color="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}" />
+        </FlyoutItem.Icon>
         <ShellContent ContentTemplate="{DataTemplate views:DashboardListPage}" Route="dashboard" />
     </FlyoutItem>
 
     <FlyoutItem Title="Logradouros">
+        <FlyoutItem.Icon>
+            <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe7f1;" Color="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}" />
+        </FlyoutItem.Icon>
         <ShellContent ContentTemplate="{DataTemplate views:LogradouroListPage}" Route="logradouros" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Configurações">
+        <FlyoutItem.Icon>
+            <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b8;" Color="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}" />
+        </FlyoutItem.Icon>
+        <ShellContent ContentTemplate="{DataTemplate views:ConfigPage}" Route="configuracoes" />
     </FlyoutItem>
 
 </Shell>

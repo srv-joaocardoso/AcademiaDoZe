@@ -1,20 +1,38 @@
-﻿// João Victor Cardoso Gonçalves - 155953 - DEV02
+// João Victor Cardoso Gonçalves - 155953 - DEV02
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using AcademiaDoZe.Domain.Common;
 
 namespace AcademiaDoZe.Domain.Entities;
 
-internal class AcessoAluno
+public class AcessoAluno : Entity, IAggregateRoot
 {
-    public Aluno Aluno { get; private set; }
+    public int AlunoId { get; private set; }
     public DateTime DataHora { get; private set; }
 
-    private AcessoAluno(int id, Aluno aluno, DateTime dataHora) : base(id)
+    private AcessoAluno(int id, int alunoId, DateTime dataHora) : base(id)
     {
-        Aluno = aluno;
+        AlunoId = alunoId;
         DataHora = dataHora;
+    }
+
+    public static Result<AcessoAluno> Criar(int id, Aluno aluno, DateTime dataHora)
+    {
+        var notifications = new List<Notification>();
+
+        if (aluno == null)
+            notifications.Add(new Notification("Aluno", "ALUNO_INVALIDO"));
+
+        if (dataHora.TimeOfDay < new TimeSpan(6, 0, 0) || dataHora.TimeOfDay > new TimeSpan(22, 0, 0))
+            notifications.Add(new Notification("DataHora", "DATA_HORA_INTERVALO_INVALIDO"));
+
+        if (notifications.Count != 0)
+            return Result<AcessoAluno>.Failure(notifications);
+
+        return Result<AcessoAluno>.Success(new AcessoAluno(id, aluno!.Id, dataHora));
     }
 }
 
+// Dependem da persistência:
+// Validar se possui matrícula ativa
+// Na entrada, mostrar quanto tempo ainda tem de plano
+// Na saída, mostrar o tempo que permaneceu na academia

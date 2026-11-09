@@ -79,12 +79,6 @@ public partial class DashboardListViewModel : BaseViewModel
     [RelayCommand]
     private async Task NavigateToColaboradoresAsync() => await Shell.Current.GoToAsync("//colaboradores");
 
-    // matrículas ainda não tem tela
     [RelayCommand]
-    private async Task NavigateToMatriculasAsync() => await EmBreveAsync("Matrículas");
-
-    private static async Task EmBreveAsync(string funcionalidade)
-    {
-        await Shell.Current.DisplayAlertAsync(funcionalidade, $"A tela de {funcionalidade} ainda não foi implementada.", "OK");
-    }
+    private async Task NavigateToMatriculasAsync() => await Shell.Current.GoToAsync("//matriculas");
 }

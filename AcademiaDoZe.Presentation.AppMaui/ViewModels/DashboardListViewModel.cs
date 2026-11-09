@@ -73,13 +73,13 @@ public partial class DashboardListViewModel : BaseViewModel
     [RelayCommand]
     private async Task NavigateToLogradourosAsync() => await Shell.Current.GoToAsync("//logradouros");
 
-    // alunos, colaboradores e matrículas ainda não têm tela
     [RelayCommand]
-    private async Task NavigateToAlunosAsync() => await EmBreveAsync("Alunos");
+    private async Task NavigateToAlunosAsync() => await Shell.Current.GoToAsync("//alunos");
 
     [RelayCommand]
-    private async Task NavigateToColaboradoresAsync() => await EmBreveAsync("Colaboradores");
+    private async Task NavigateToColaboradoresAsync() => await Shell.Current.GoToAsync("//colaboradores");
 
+    // matrículas ainda não tem tela
     [RelayCommand]
     private async Task NavigateToMatriculasAsync() => await EmBreveAsync("Matrículas");
 

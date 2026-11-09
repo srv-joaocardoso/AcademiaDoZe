@@ -73,7 +73,7 @@ public class ColaboradorService : IColaboradorService
             return [.. colaboradores.Select(c => c.ToDto(logradouros.GetValueOrDefault(c.Endereco.LogradouroId)))];
         }
 
-        return [.. colaboradores.Select(c => c.ToDto())];
+        return await ComEnderecoAsync(colaboradores, cancellationToken);
     }
 
     public async Task<bool> RemoverAsync(int id, CancellationToken cancellationToken = default)
@@ -97,7 +97,7 @@ public class ColaboradorService : IColaboradorService
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(cpf));
 
         var colaborador = await _repoFactory.Usar(r => r.ObterPorCpf(cpfResult.Value!, cancellationToken));
-        return colaborador?.ToDto();
+        return colaborador == null ? null : await ComEnderecoAsync(colaborador, cancellationToken);
     }
 
     public async Task<ColaboradorDto?> ObterPorEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -110,19 +110,19 @@ public class ColaboradorService : IColaboradorService
             throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(email));
 
         var colaborador = await _repoFactory.Usar(r => r.ObterPorEmail(emailResult.Value!, cancellationToken));
-        return colaborador?.ToDto();
+        return colaborador == null ? null : await ComEnderecoAsync(colaborador, cancellationToken);
     }
 
     public async Task<IEnumerable<ColaboradorDto>> ObterPorTipoAsync(AppColaboradorTipo tipo, CancellationToken cancellationToken = default)
     {
         var colaboradores = await _repoFactory.Usar(r => r.ObterPorTipo(tipo.ToDomain(), cancellationToken));
-        return [.. colaboradores.Select(c => c.ToDto())];
+        return await ComEnderecoAsync(colaboradores, cancellationToken);
     }
 
     public async Task<IEnumerable<ColaboradorDto>> ObterPorVinculoAsync(AppColaboradorVinculo vinculo, CancellationToken cancellationToken = default)
     {
         var colaboradores = await _repoFactory.Usar(r => r.ObterPorVinculo(vinculo.ToDomain(), cancellationToken));
-        return [.. colaboradores.Select(c => c.ToDto())];
+        return await ComEnderecoAsync(colaboradores, cancellationToken);
     }
 
     public async Task<bool> TrocarSenhaAsync(int id, string novaSenha, CancellationToken cancellationToken = default)
@@ -255,5 +255,29 @@ public class ColaboradorService : IColaboradorService
         var colaboradorAtualizado = colaboradorExistente.UpdateFromDto(colaboradorDto, logradouro);
         var atualizado = await _repoFactory.Usar(r => r.Atualizar(colaboradorAtualizado, cancellationToken));
         return atualizado.ToDto(logradouro);
+    }
+
+    // as buscas por CPF, e-mail, etc. não traziam o logradouro; sem ele a tela mostra o endereço vazio
+    private async Task<ColaboradorDto> ComEnderecoAsync(Domain.Entities.Colaborador colaborador, CancellationToken cancellationToken)
+    {
+        if (_logradouroRepoFactory == null) return colaborador.ToDto();
+
+        var logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(colaborador.Endereco.LogradouroId, cancellationToken));
+        return colaborador.ToDto(logradouro);
+    }
+
+    private async Task<IEnumerable<ColaboradorDto>> ComEnderecoAsync(IEnumerable<Domain.Entities.Colaborador> lista, CancellationToken cancellationToken)
+    {
+        var itens = lista.ToList();
+        if (_logradouroRepoFactory == null) return [.. itens.Select(i => i.ToDto())];
+
+        // busca cada logradouro uma vez só
+        var logradouros = new Dictionary<int, Domain.Entities.Logradouro?>();
+        foreach (var id in itens.Select(i => i.Endereco.LogradouroId).Distinct())
+        {
+            logradouros[id] = await _logradouroRepoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
+        }
+
+        return [.. itens.Select(i => i.ToDto(logradouros[i.Endereco.LogradouroId]))];
     }
 }

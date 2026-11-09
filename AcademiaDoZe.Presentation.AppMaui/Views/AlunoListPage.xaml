@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.AlunoListPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             xmlns:dto="clr-namespace:AcademiaDoZe.Application.DTOs;assembly=AcademiaDoZe.Application"
+             xmlns:converters="clr-namespace:AcademiaDoZe.Presentation.AppMaui.Converters"
+             x:DataType="vm:AlunoListViewModel"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+
+        <!-- card de um aluno, usado pelo CollectionView -->
+        <DataTemplate x:Key="AlunoItemTemplate" x:DataType="dto:AlunoDto">
+            <Border Style="{StaticResource CardBorder}" Margin="6">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+
+                    <!-- foto redonda; o tamanho muda conforme o dispositivo -->
+                    <Border Grid.Column="0" StrokeThickness="2" VerticalOptions="Start"
+                            Stroke="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}">
+                        <Border.StrokeShape>
+                            <Ellipse />
+                        </Border.StrokeShape>
+                        <Border.HeightRequest>
+                            <OnIdiom x:TypeArguments="x:Double">
+                                <OnIdiom.Phone>64</OnIdiom.Phone>
+                                <OnIdiom.Tablet>84</OnIdiom.Tablet>
+                                <OnIdiom.Desktop>84</OnIdiom.Desktop>
+                                <OnIdiom.Default>72</OnIdiom.Default>
+                            </OnIdiom>
+                        </Border.HeightRequest>
+                        <Border.WidthRequest>
+                            <OnIdiom x:TypeArguments="x:Double">
+                                <OnIdiom.Phone>64</OnIdiom.Phone>
+                                <OnIdiom.Tablet>84</OnIdiom.Tablet>
+                                <OnIdiom.Desktop>84</OnIdiom.Desktop>
+                                <OnIdiom.Default>72</OnIdiom.Default>
+                            </OnIdiom>
+                        </Border.WidthRequest>
+                        <Image Source="{Binding Foto, Converter={StaticResource FotoToImageSourceConverter}}" Aspect="AspectFill" />
+                    </Border>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="3">
+                        <Label Text="{Binding Nome}" FontAttributes="Bold" FontSize="16" LineBreakMode="TailTruncation" />
+                        <Label Text="{Binding Cpf, StringFormat='CPF: {0}'}" FontSize="13" />
+                        <Label Text="{Binding Telefone, StringFormat='Telefone: {0}'}" FontSize="13" />
+                        <Label Text="{Binding Email}" FontSize="13" LineBreakMode="TailTruncation"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardCyan}, Dark={StaticResource DraculaCyan}}" />
+                        <Label Text="{Binding DataNascimento, StringFormat='Nasc. {0:dd/MM/yyyy}'}" FontSize="13" />
+                        <Label FontSize="12" LineBreakMode="TailTruncation"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Endereco.Nome}" />
+                                    <Span Text=", " />
+                                    <Span Text="{Binding Numero}" />
+                                    <Span Text=" - " />
+                                    <Span Text="{Binding Endereco.Bairro}" />
+                                    <Span Text=", " />
+                                    <Span Text="{Binding Endereco.Cidade}" />
+                                    <Span Text="/" />
+                                    <Span Text="{Binding Endereco.Estado}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+
+                    <!-- ações -->
+                    <VerticalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Start">
+                        <Button Style="{StaticResource ButtonIcone}" Clicked="OnEditButtonClicked"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource AlucardCyan}, Dark={StaticResource DraculaCyan}}">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe3c9;" Size="18"
+                                                 Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                            </Button.ImageSource>
+                        </Button>
+                        <Button Style="{StaticResource ButtonIcone}" Clicked="OnDeleteButtonClicked"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource AlucardRed}, Dark={StaticResource DraculaRed}}">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe872;" Size="18"
+                                                 Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaForeground}}" />
+                            </Button.ImageSource>
+                        </Button>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Barra de busca com filtro -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorder}" Margin="16,12">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Picker Grid.Column="0" ItemsSource="{Binding FilterTypes}" SelectedItem="{Binding SelectedFilterType}" WidthRequest="110" VerticalOptions="Center" />
+                <Entry Grid.Column="1" Text="{Binding SearchText}" Placeholder="Digite o valor..." ClearButtonVisibility="WhileEditing"
+                       ReturnCommand="{Binding SearchAlunosCommand}" VerticalOptions="Center" />
+                <Button Grid.Column="2" Text="Buscar" Style="{StaticResource ButtonPrimary}" FontSize="14" HeightRequest="40" WidthRequest="116"
+                        Command="{Binding SearchAlunosCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b6;" Size="16"
+                                         Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- lista/grade + botão flutuante -->
+        <Grid Grid.Row="1">
+            <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+                <CollectionView ItemsSource="{Binding Alunos}" SelectionMode="None" Margin="10,0"
+                                ItemTemplate="{StaticResource AlunoItemTemplate}">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical">
+                            <!-- quantidade de colunas conforme o dispositivo -->
+                            <GridItemsLayout.Span>
+                                <OnIdiom x:TypeArguments="x:Int32">
+                                    <OnIdiom.Phone>1</OnIdiom.Phone>
+                                    <OnIdiom.Tablet>2</OnIdiom.Tablet>
+                                    <OnIdiom.Desktop>2</OnIdiom.Desktop>
+                                    <OnIdiom.TV>3</OnIdiom.TV>
+                                    <OnIdiom.Default>1</OnIdiom.Default>
+                                </OnIdiom>
+                            </GridItemsLayout.Span>
+                        </GridItemsLayout>
+                    </CollectionView.ItemsLayout>
+
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="16" Padding="20">
+                            <Label Text="Nenhum aluno encontrado" HorizontalOptions="Center" FontSize="18"
+                                   TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+                            <Button Text="Adicionar primeiro aluno" Command="{Binding AddAlunoCommand}"
+                                    Style="{StaticResource ButtonPrimary}" HorizontalOptions="Center" Padding="24,0" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+            </RefreshView>
+
+            <!-- Floating Action Button -->
+            <Button Text="&#xe145;" FontFamily="MaterialIcons" FontSize="30" Padding="0" Command="{Binding AddAlunoCommand}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}"
+                    TextColor="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}"
+                    CornerRadius="30" WidthRequest="60" HeightRequest="60"
+                    HorizontalOptions="End" VerticalOptions="End" Margin="24">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.5" />
+                </Button.Shadow>
+            </Button>
+        </Grid>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="0" Grid.RowSpan="2" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                           Color="{AppThemeBinding Light={StaticResource AlucardPink}, Dark={StaticResource DraculaPink}}"
+                           VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

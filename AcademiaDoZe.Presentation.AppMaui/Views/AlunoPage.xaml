@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.AlunoPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             xmlns:converters="clr-namespace:AcademiaDoZe.Presentation.AppMaui.Converters"
+             x:DataType="vm:AlunoViewModel"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+        <converters:DateOnlyToDateTimeConverter x:Key="DateOnlyConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="16" MaximumWidthRequest="760">
+                <VerticalStackLayout.Padding>
+                    <OnIdiom x:TypeArguments="Thickness">
+                        <OnIdiom.Phone>10</OnIdiom.Phone>
+                        <OnIdiom.Desktop>20</OnIdiom.Desktop>
+                        <OnIdiom.Default>16</OnIdiom.Default>
+                    </OnIdiom>
+                </VerticalStackLayout.Padding>
+
+                <!-- Foto -->
+                <Border Style="{StaticResource CardDestaque}">
+                    <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                        <Border StrokeThickness="3" HeightRequest="140" WidthRequest="140" HorizontalOptions="Center"
+                                Stroke="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}">
+                            <Border.StrokeShape>
+                                <Ellipse />
+                            </Border.StrokeShape>
+                            <Image Source="{Binding Aluno.Foto, Converter={StaticResource FotoToImageSourceConverter}}" Aspect="AspectFill" />
+                        </Border>
+                        <Button Text="Câmera ou Galeria" Command="{Binding SelecionarFotoCommand}" Style="{StaticResource ButtonPrimary}" Padding="20,0">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe412;" Size="18"
+                                                 Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                            </Button.ImageSource>
+                        </Button>
+                        <Label Text="{Binding Aluno.Id, StringFormat='Aluno ID: {0}'}" IsVisible="{Binding IsEditMode}" HorizontalOptions="Center" FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- CPF -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="CPF" Style="{StaticResource CampoTitulo}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Entry Grid.Column="0" Text="{Binding Aluno.Cpf}" Placeholder="000.000.000-00" Keyboard="Numeric" MaxLength="14"
+                                   ClearButtonVisibility="WhileEditing" ReturnCommand="{Binding SearchByCpfCommand}" />
+                            <Button Grid.Column="1" Text="Buscar CPF" Command="{Binding SearchByCpfCommand}" Style="{StaticResource ButtonPrimary}"
+                                    HeightRequest="40" Padding="16,0" FontSize="14">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b6;" Size="16"
+                                                     Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                                </Button.ImageSource>
+                            </Button>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Dados Pessoais -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Dados Pessoais" FontSize="18" FontAttributes="Bold" />
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Nome completo" Style="{StaticResource CampoTitulo}" />
+                            <Entry Text="{Binding Aluno.Nome}" Placeholder="Digite o nome completo..." MaxLength="150" ClearButtonVisibility="WhileEditing" />
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="Data de Nascimento" Style="{StaticResource CampoTitulo}" />
+                                <DatePicker Date="{Binding Aluno.DataNascimento, Converter={StaticResource DateOnlyConverter}, Mode=TwoWay}" Format="dd/MM/yyyy" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Telefone" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding Aluno.Telefone}" Placeholder="(00) 00000-0000" Keyboard="Telephone" MaxLength="15" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="E-mail" Style="{StaticResource CampoTitulo}" />
+                            <Entry Text="{Binding Aluno.Email}" Placeholder="exemplo@email.com" Keyboard="Email" MaxLength="100" ClearButtonVisibility="WhileEditing" />
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="Senha" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding Aluno.Senha}" Placeholder="Digite a senha..." IsPassword="True" MaxLength="50" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Confirmar Senha" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding ConfirmarSenha}" Placeholder="Confirme a senha..." IsPassword="True" MaxLength="50" />
+                            </VerticalStackLayout>
+                        </Grid>
+                        <Label Text="* Deixe em branco para manter a senha atual." FontSize="11" IsVisible="{Binding IsEditMode}"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Endereço -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Endereço" FontSize="18" FontAttributes="Bold" />
+
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Entry Grid.Column="0" Text="{Binding Aluno.Endereco.Cep}" Placeholder="00000-000" Keyboard="Numeric" MaxLength="9"
+                                   ClearButtonVisibility="WhileEditing" ReturnCommand="{Binding SearchByCepCommand}" />
+                            <Button Grid.Column="1" Text="Buscar CEP" Command="{Binding SearchByCepCommand}" Style="{StaticResource ButtonPrimary}"
+                                    HeightRequest="40" Padding="16,0" FontSize="14">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b6;" Size="16"
+                                                     Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                                </Button.ImageSource>
+                            </Button>
+                        </Grid>
+
+                        <!-- aviso quando ainda não há logradouro vinculado -->
+                        <Border IsVisible="{Binding HasNoEnderecoVinculado}" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource AlucardFloor}, Dark={StaticResource Black}}">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label FontFamily="MaterialIcons" Text="&#xe002;" FontSize="18" VerticalOptions="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}" />
+                                <Label Text="Nenhum logradouro vinculado. Digite o CEP e clique em Buscar CEP." FontSize="13" VerticalOptions="Center"
+                                       TextColor="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}" />
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- dados do logradouro vinculado -->
+                        <Border IsVisible="{Binding HasEnderecoVinculado}" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource AlucardFloor}, Dark={StaticResource Black}}">
+                            <VerticalStackLayout Spacing="4">
+                                <HorizontalStackLayout Spacing="6">
+                                    <Label FontFamily="MaterialIcons" Text="&#xe876;" FontSize="18" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" />
+                                    <Label Text="Logradouro vinculado" FontAttributes="Bold" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" />
+                                </HorizontalStackLayout>
+                                <Label Text="{Binding Aluno.Endereco.Nome}" FontAttributes="Bold" />
+                                <Label FontSize="13">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Aluno.Endereco.Bairro}" />
+                                            <Span Text=" • " />
+                                            <Span Text="{Binding Aluno.Endereco.Cidade}" />
+                                            <Span Text=" - " />
+                                            <Span Text="{Binding Aluno.Endereco.Estado}" />
+                                            <Span Text=" • " />
+                                            <Span Text="{Binding Aluno.Endereco.Pais}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Grid ColumnDefinitions="120,*" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="Número" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding Aluno.Numero}" Placeholder="Nº" MaxLength="20" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="Complemento" Style="{StaticResource CampoTitulo}" />
+                                <Entry Text="{Binding Aluno.Complemento}" Placeholder="Complemento (opcional)" MaxLength="50" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Botões de ação -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,0,0,10">
+                    <Button Grid.Column="0" Text="Cancelar" Command="{Binding CancelCommand}" Style="{StaticResource ButtonSecondary}">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe5c9;" Size="18"
+                                             Color="{AppThemeBinding Light={StaticResource AlucardForeground}, Dark={StaticResource DraculaForeground}}" />
+                        </Button.ImageSource>
+                    </Button>
+                    <Button Grid.Column="1" Text="Salvar" Command="{Binding SaveAlunoCommand}" Style="{StaticResource ButtonPrimary}">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe161;" Size="18"
+                                             Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                        </Button.ImageSource>
+                    </Button>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                           Color="{AppThemeBinding Light={StaticResource AlucardPink}, Dark={StaticResource DraculaPink}}"
+                           VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

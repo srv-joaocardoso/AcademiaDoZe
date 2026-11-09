@@ -64,7 +64,8 @@ public static class MatriculaMappingExtensions
         ArgumentNullException.ThrowIfNull(matriculaDto);
         ArgumentNullException.ThrowIfNull(aluno);
 
-        Arquivo? laudo = matricula.LaudoMedico;
+        // a tela sempre envia o laudo atual; sem laudo no DTO significa que foi removido
+        Arquivo? laudo = null;
         if (matriculaDto.LaudoMedico?.Conteudo != null)
         {
             var laudoResult = Arquivo.Criar(matriculaDto.LaudoMedico.Conteudo);
@@ -74,10 +75,11 @@ public static class MatriculaMappingExtensions
         var result = Matricula.Criar(
             matricula.Id,
             aluno,
-            matriculaDto.Plano != default ? matriculaDto.Plano.ToDomain() : matricula.Plano,
+            // Plano e Restricoes vêm sempre preenchidos; comparar com default ignoraria Mensal e None (valor 0)
+            matriculaDto.Plano.ToDomain(),
             matriculaDto.DataInicio != default ? matriculaDto.DataInicio : matricula.DataInicio,
             matriculaDto.Objetivo ?? matricula.Objetivo,
-            matriculaDto.RestricoesMedicas != default ? matriculaDto.RestricoesMedicas.ToDomain() : matricula.RestricoesMedicas,
+            matriculaDto.RestricoesMedicas.ToDomain(),
             laudo,
             matriculaDto.ObservacoesRestricoes ?? matricula.ObservacoesRestricoes
         );

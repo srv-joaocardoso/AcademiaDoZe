@@ -158,19 +158,14 @@ public class MatriculaService : IMatriculaService
             ?? throw new InvalidOperationException($"Aluno associado à matrícula {matriculaDto.Id} não encontrado.");
 
         bool menorDe16 = aluno.DataNascimento > DateOnly.FromDateTime(DateTime.Today.AddYears(-16));
-        bool possuiLaudo = (matriculaDto.LaudoMedico?.Conteudo != null && matriculaDto.LaudoMedico.Conteudo.Length > 0)
-            || (matriculaDto.LaudoMedico == null && matriculaExistente.LaudoMedico != null);
+        bool possuiLaudo = matriculaDto.LaudoMedico?.Conteudo != null && matriculaDto.LaudoMedico.Conteudo.Length > 0;
 
         if (menorDe16 && !possuiLaudo)
         {
             throw new InvalidOperationException("Alunos menores de 16 anos devem obrigatoriamente apresentar um laudo médico que os autorize a praticar atividades físicas.");
         }
 
-        var restricoes = matriculaDto.RestricoesMedicas != default
-            ? matriculaDto.RestricoesMedicas
-            : matriculaExistente.RestricoesMedicas.ToApplication();
-
-        if (restricoes != AppMatriculaRestricoes.None && !possuiLaudo)
+        if (matriculaDto.RestricoesMedicas != AppMatriculaRestricoes.None && !possuiLaudo)
         {
             throw new InvalidOperationException("Alunos com restrições de saúde registradas devem apresentar um parecer médico autorizando a realização de atividades físicas.");
         }

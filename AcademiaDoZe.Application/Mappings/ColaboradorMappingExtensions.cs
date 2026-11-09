@@ -98,8 +98,9 @@ public static class ColaboradorMappingExtensions
             senha,
             foto!,
             colaboradorDto.DataAdmissao != default ? colaboradorDto.DataAdmissao : colaborador.DataAdmissao,
-            colaboradorDto.Tipo != default ? colaboradorDto.Tipo.ToDomain() : colaborador.Tipo,
-            colaboradorDto.Vinculo != default ? colaboradorDto.Vinculo.ToDomain() : colaborador.Vinculo
+            // Tipo e Vinculo são required no DTO; comparar com default ignoraria Administrador e CLT (valor 0)
+            colaboradorDto.Tipo.ToDomain(),
+            colaboradorDto.Vinculo.ToDomain()
         );
 
         if (result.IsFailure)

@@ -72,7 +72,7 @@ public class AlunoService : IAlunoService
             return [.. alunos.Select(a => a.ToDto(logradouros.GetValueOrDefault(a.Endereco.LogradouroId)))];
         }
 
-        return [.. alunos.Select(a => a.ToDto())];
+        return await ComEnderecoAsync(alunos, cancellationToken);
     }
 
     public async Task<AlunoDto?> ObterPorCpfAsync(string cpf, CancellationToken cancellationToken = default)
@@ -85,7 +85,7 @@ public class AlunoService : IAlunoService
             throw new ArgumentException($"CPF inválido: {string.Join(", ", cpfResult.Notifications.Select(n => n.Mensagem))}", nameof(cpf));
 
         var aluno = await _repoFactory.Usar(r => r.ObterPorCpf(cpfResult.Value!, cancellationToken));
-        return aluno?.ToDto();
+        return aluno == null ? null : await ComEnderecoAsync(aluno, cancellationToken);
     }
 
     public async Task<bool> RemoverAsync(int id, CancellationToken cancellationToken = default)
@@ -109,7 +109,7 @@ public class AlunoService : IAlunoService
             throw new ArgumentException($"Email inválido: {string.Join(", ", emailResult.Notifications.Select(n => n.Mensagem))}", nameof(email));
 
         var aluno = await _repoFactory.Usar(r => r.ObterPorEmail(emailResult.Value!, cancellationToken));
-        return aluno?.ToDto();
+        return aluno == null ? null : await ComEnderecoAsync(aluno, cancellationToken);
     }
 
     public async Task<IEnumerable<AlunoDto>> ObterPorNomeAsync(string nome, CancellationToken cancellationToken = default)
@@ -118,7 +118,7 @@ public class AlunoService : IAlunoService
             throw new ArgumentException("Nome não pode ser vazio.", nameof(nome));
 
         var alunos = await _repoFactory.Usar(r => r.ObterPorNome(nome.Trim(), cancellationToken));
-        return [.. alunos.Select(a => a.ToDto())];
+        return await ComEnderecoAsync(alunos, cancellationToken);
     }
 
     public async Task<bool> TrocarSenhaAsync(int id, string novaSenha, CancellationToken cancellationToken = default)
@@ -251,5 +251,29 @@ public class AlunoService : IAlunoService
         var alunoAtualizado = alunoExistente.UpdateFromDto(alunoDto, logradouro);
         var atualizado = await _repoFactory.Usar(r => r.Atualizar(alunoAtualizado, cancellationToken));
         return atualizado.ToDto(logradouro);
+    }
+
+    // as buscas por CPF, e-mail, etc. não traziam o logradouro; sem ele a tela mostra o endereço vazio
+    private async Task<AlunoDto> ComEnderecoAsync(Domain.Entities.Aluno aluno, CancellationToken cancellationToken)
+    {
+        if (_logradouroRepoFactory == null) return aluno.ToDto();
+
+        var logradouro = await _logradouroRepoFactory.Usar(r => r.ObterPorId(aluno.Endereco.LogradouroId, cancellationToken));
+        return aluno.ToDto(logradouro);
+    }
+
+    private async Task<IEnumerable<AlunoDto>> ComEnderecoAsync(IEnumerable<Domain.Entities.Aluno> lista, CancellationToken cancellationToken)
+    {
+        var itens = lista.ToList();
+        if (_logradouroRepoFactory == null) return [.. itens.Select(i => i.ToDto())];
+
+        // busca cada logradouro uma vez só
+        var logradouros = new Dictionary<int, Domain.Entities.Logradouro?>();
+        foreach (var id in itens.Select(i => i.Endereco.LogradouroId).Distinct())
+        {
+            logradouros[id] = await _logradouroRepoFactory.Usar(r => r.ObterPorId(id, cancellationToken));
+        }
+
+        return [.. itens.Select(i => i.ToDto(logradouros[i.Endereco.LogradouroId]))];
     }
 }

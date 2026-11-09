@@ -478,6 +478,13 @@
         <Setter Property="WidthRequest" Value="96"/>
     </Style>
 
+    <Style TargetType="Button" x:Key="ButtonIcone">
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="HeightRequest" Value="40"/>
+        <Setter Property="WidthRequest" Value="40"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
     <Style TargetType="Button" x:Key="ButtonDanger">
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource AlucardRed}, Dark={StaticResource DraculaRed}}"/>
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaForeground}}"/>

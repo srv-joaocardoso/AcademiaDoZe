@@ -32,7 +32,7 @@ public class AcessoAluno : Entity, IAggregateRoot
     }
 }
 
-// Dependem da persistência:
+// Regras que dependem da persistência, implementadas no AcessoAlunoService (Application):
 // Validar se possui matrícula ativa
 // Na entrada, mostrar quanto tempo ainda tem de plano
 // Na saída, mostrar o tempo que permaneceu na academia

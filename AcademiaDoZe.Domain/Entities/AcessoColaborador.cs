@@ -32,6 +32,6 @@ public class AcessoColaborador : Entity, IAggregateRoot
     }
 }
 
-// Dependem da persistência:
+// Regras que dependem da persistência, implementadas no AcessoColaboradorService (Application):
 // Validar se já não ultrapassa o limite de: 8 horas se for clt, 6 horas se for estágio.
 // Na saída, mostrar o tempo que permaneceu na academia, devendo ser somado todos os registros do dia.

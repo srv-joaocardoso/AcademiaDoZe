@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.AcessoPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             xmlns:converters="clr-namespace:AcademiaDoZe.Presentation.AppMaui.Converters"
+             x:DataType="vm:AcessoViewModel"
+             Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+    </ContentPage.Resources>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Spacing="16" MaximumWidthRequest="900">
+                <VerticalStackLayout.Padding>
+                    <OnIdiom x:TypeArguments="Thickness">
+                        <OnIdiom.Phone>10</OnIdiom.Phone>
+                        <OnIdiom.Desktop>20</OnIdiom.Desktop>
+                        <OnIdiom.Default>16</OnIdiom.Default>
+                    </OnIdiom>
+                </VerticalStackLayout.Padding>
+
+                <!-- Modo: Aluno ou Colaborador -->
+                <Border Style="{StaticResource CardDestaque}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Controle de Acesso / Catraca" FontSize="24" HorizontalTextAlignment="Center" />
+                        <Label Text="Selecione se o acesso é de um Aluno ou Colaborador:" FontSize="13" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <Button Grid.Column="0" Text="Aluno" Command="{Binding SelecionarAlunoCommand}" Style="{StaticResource ButtonPrimary}" HeightRequest="44">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe80c;" Size="18"
+                                                     Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                                </Button.ImageSource>
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsModoAluno}" Value="False">
+                                        <Setter Property="Opacity" Value="0.45" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                            <Button Grid.Column="1" Text="Colaborador" Command="{Binding SelecionarColaboradorCommand}" Style="{StaticResource ButtonPrimary}" HeightRequest="44">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xea67;" Size="18"
+                                                     Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                                </Button.ImageSource>
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button" Binding="{Binding IsModoColaborador}" Value="False">
+                                        <Setter Property="Opacity" Value="0.45" />
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
+                        </Grid>
+                        <Label Text="{Binding ModoTexto}" FontSize="13" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Localizar pessoa -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Localizar Pessoa" FontSize="20" HorizontalTextAlignment="Center" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Entry Grid.Column="0" Text="{Binding TextoBusca}" Placeholder="Nome ou CPF" ClearButtonVisibility="WhileEditing"
+                                   ReturnCommand="{Binding BuscarCommand}" />
+                            <Button Grid.Column="1" Text="Buscar" Command="{Binding BuscarCommand}" Style="{StaticResource ButtonPrimary}"
+                                    HeightRequest="40" Padding="16,0" FontSize="14">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe8b6;" Size="16"
+                                                     Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                                </Button.ImageSource>
+                            </Button>
+                        </Grid>
+                        <Label Text="{Binding SelecioneTexto}" Style="{StaticResource CampoTitulo}" FontAttributes="Bold" />
+                        <Picker Title="Toque para escolher..." ItemsSource="{Binding Pessoas}" SelectedItem="{Binding PessoaSelecionada}"
+                                ItemDisplayBinding="{Binding Nome, x:DataType=vm:PessoaAcessoItem}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Identificação e liberação -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Identificação e Liberação" FontSize="20" HorizontalTextAlignment="Center" />
+
+                        <Label Text="Nenhuma pessoa selecionada." IsVisible="{Binding HasNoPessoa}" HorizontalTextAlignment="Center" FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}" />
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" IsVisible="{Binding HasPessoa}">
+                            <Border Grid.Column="0" StrokeThickness="2" HeightRequest="72" WidthRequest="72" VerticalOptions="Center"
+                                    Stroke="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}">
+                                <Border.StrokeShape>
+                                    <Ellipse />
+                                </Border.StrokeShape>
+                                <Image Source="{Binding PessoaSelecionada.Foto, Converter={StaticResource FotoToImageSourceConverter}}" Aspect="AspectFill" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                <Label Text="{Binding PessoaSelecionada.Nome}" FontAttributes="Bold" FontSize="16" LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding PessoaSelecionada.Cpf, StringFormat='CPF: {0}'}" FontSize="13" />
+                                <Label Text="{Binding PessoaSelecionada.Detalhe}" FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+                                <Label Text="{Binding InfoPessoa}" FontSize="12"
+                                       TextColor="{AppThemeBinding Light={StaticResource AlucardCyan}, Dark={StaticResource DraculaCyan}}" />
+                                <Border StrokeThickness="1" StrokeShape="RoundRectangle 6" Padding="8,3" HorizontalOptions="Start"
+                                        Stroke="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsDentro}" Value="True">
+                                            <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding SituacaoTexto}" FontSize="11" FontAttributes="Bold" />
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Button Text="{Binding BotaoTexto}" Command="{Binding RegistrarAcessoCommand}" Style="{StaticResource ButtonPrimary}"
+                                IsEnabled="{Binding HasPessoa}">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe897;" Size="18"
+                                                 Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                            </Button.ImageSource>
+                        </Button>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Resultado do último registro -->
+                <Border IsVisible="{Binding HasResultado}" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="14"
+                        BackgroundColor="#1E5C3A">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding ResultadoNegado}" Value="True">
+                            <Setter Property="BackgroundColor" Value="#7A2630" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Grid.Column="0" FontFamily="MaterialIcons" Text="&#xe86c;" FontSize="26" VerticalOptions="Center" TextColor="White">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding ResultadoNegado}" Value="True">
+                                    <Setter Property="Text" Value="&#xe14b;" />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="{Binding ResultadoTitulo}" FontAttributes="Bold" FontSize="15" TextColor="White" />
+                            <Label Text="{Binding ResultadoMensagem}" FontSize="13" TextColor="White" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Acessos de hoje -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Acessos Registrados Hoje" FontSize="20" VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="Atualizar" Command="{Binding CarregarAcessosHojeCommand}" Style="{StaticResource ButtonPrimary}"
+                                    HeightRequest="36" Padding="12,0" FontSize="13">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialIcons" Glyph="&#xe5d5;" Size="16"
+                                                     Color="{AppThemeBinding Light={StaticResource AlucardBackground}, Dark={StaticResource DraculaBackground}}" />
+                                </Button.ImageSource>
+                            </Button>
+                        </Grid>
+
+                        <Label Text="Nenhum acesso registrado hoje." IsVisible="{Binding HasNoAcessos}" FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding AcessosHoje}" Spacing="8">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:AcessoRegistradoItem">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="4">
+                                        <Border Grid.Column="0" StrokeThickness="1" HeightRequest="40" WidthRequest="40" VerticalOptions="Center"
+                                                Stroke="{AppThemeBinding Light={StaticResource AlucardPurple}, Dark={StaticResource DraculaPurple}}">
+                                            <Border.StrokeShape>
+                                                <Ellipse />
+                                            </Border.StrokeShape>
+                                            <Image Source="{Binding Foto, Converter={StaticResource FotoToImageSourceConverter}}" Aspect="AspectFill" />
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="1" VerticalOptions="Center">
+                                            <HorizontalStackLayout Spacing="6">
+                                                <Label FontFamily="MaterialIcons" Text="{Binding Icone}" FontSize="14" VerticalOptions="Center"
+                                                       TextColor="{AppThemeBinding Light={StaticResource AlucardOrange}, Dark={StaticResource DraculaOrange}}">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding Entrada}" Value="True">
+                                                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                                <Label Text="{Binding Nome}" FontAttributes="Bold" FontSize="14" />
+                                            </HorizontalStackLayout>
+                                            <Label Text="{Binding Descricao}" FontSize="12"
+                                                   TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2" Text="{Binding DataHora, StringFormat='{0:HH:mm:ss}'}" FontSize="12" VerticalOptions="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="{AppThemeBinding Light={StaticResource AlucardPink}, Dark={StaticResource DraculaPink}}"
+                           VerticalOptions="Center" HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

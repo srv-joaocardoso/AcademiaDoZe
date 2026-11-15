@@ -80,6 +80,17 @@
                     </Border>
                 </Grid>
 
+                <!-- Card Controle de Acesso -->
+                <Border Style="{StaticResource CardDestaque}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToAcessosCommand}" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="14" HorizontalOptions="Center">
+                        <Label Text="&#xe897;" Style="{StaticResource CardIcone}" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource AlucardGreen}, Dark={StaticResource DraculaGreen}}" />
+                        <Label Text="Controle de Acesso (Entrada/Saída)" Style="{StaticResource CardTitulo}" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
                 <Label Text="João Victor Cardoso Gonçalves • 155953" HorizontalTextAlignment="Center" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource AlucardComment}, Dark={StaticResource DraculaComment}}" />
             </VerticalStackLayout>
         </ScrollView>

@@ -10,7 +10,6 @@ namespace AcademiaDoZe.Application.DependencyInjection;
 
 public static class ApplicationDependencyInjection
 {
-    // falta AcessoAluno e AcessoColaborador
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         // Registra os serviços da camada de aplicação
@@ -18,6 +17,8 @@ public static class ApplicationDependencyInjection
         services.AddTransient<IColaboradorService, ColaboradorService>();
         services.AddTransient<IAlunoService, AlunoService>();
         services.AddTransient<IMatriculaService, MatriculaService>();
+        services.AddTransient<IAcessoAlunoService, AcessoAlunoService>();
+        services.AddTransient<IAcessoColaboradorService, AcessoColaboradorService>();
 
         // AddScoped: cria uma instância do serviço por requisição HTTP.
         // AddSingleton: cria uma única instância do serviço durante toda a vida útil da aplicação.
@@ -46,6 +47,18 @@ public static class ApplicationDependencyInjection
         {
             var config = provider.GetRequiredService<RepositoryConfig>();
             return (Func<IMatriculaRepository>)(() => new MatriculaRepository(config.ConnectionString, config.DatabaseType));
+        });
+
+        services.AddTransient(provider =>
+        {
+            var config = provider.GetRequiredService<RepositoryConfig>();
+            return (Func<IAcessoAlunoRepository>)(() => new AcessoAlunoRepository(config.ConnectionString, config.DatabaseType));
+        });
+
+        services.AddTransient(provider =>
+        {
+            var config = provider.GetRequiredService<RepositoryConfig>();
+            return (Func<IAcessoColaboradorRepository>)(() => new AcessoColaboradorRepository(config.ConnectionString, config.DatabaseType));
         });
 
         return services;
